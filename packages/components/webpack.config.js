@@ -1,6 +1,9 @@
-const path = require("path");
+import * as path from "path";
 
-module.exports = {
+import * as url from "url";
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+
+const config = {
   mode: "production",
   devtool: "source-map",
   profile: true,
@@ -16,7 +19,10 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: [".js", ".tsx", ".ts"],
+    extensions: [".ts", ".tsx", ".js"],
+    extensionAlias: {
+      ".js": [".js", ".ts", ".tsx"],
+    },
     alias: {
       "@quri/squiggle-lang": path.resolve(__dirname, "../squiggle-lang/src"),
     },
@@ -51,3 +57,12 @@ module.exports = {
     },
   },
 };
+
+if (process.env.ANALYZE) {
+  const BundleAnalyzerPlugin =
+    require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+
+  config.plugins = [...(config.plugins ?? []), new BundleAnalyzerPlugin()];
+}
+
+export default config;

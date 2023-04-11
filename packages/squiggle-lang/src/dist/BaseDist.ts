@@ -1,9 +1,9 @@
-import { result } from "../utility/result";
-import * as Result from "../utility/result";
-import { DistError, notYetImplemented } from "./DistError";
-import { PointSetDist } from "./PointSetDist";
-import * as magicNumbers from "../magicNumbers";
-import { Env } from "./env";
+import { result } from "../utility/result.js";
+import * as Result from "../utility/result.js";
+import { DistError, notYetImplemented } from "./DistError.js";
+import { PointSetDist } from "./PointSetDist.js";
+import * as magicNumbers from "../magicNumbers.js";
+import { Env } from "./env.js";
 
 export abstract class BaseDist {
   abstract min(): number;
@@ -15,7 +15,7 @@ export abstract class BaseDist {
 
   abstract normalize(): BaseDist;
   isNormalized(): boolean {
-    return Math.abs(this.integralEndY() - 1) < 1e-7;
+    return Math.abs(this.integralSum() - 1) < 1e-7;
   }
 
   abstract truncate(
@@ -24,18 +24,17 @@ export abstract class BaseDist {
     opts?: { env: Env } // needed for SymbolicDists
   ): result<BaseDist, DistError>;
 
-  abstract integralEndY(): number;
+  abstract integralSum(): number;
 
   abstract pdf(x: number, opts: { env: Env }): result<number, DistError>;
   abstract cdf(x: number): number;
   abstract inv(x: number): number;
 
   stdev(): result<number, DistError> {
-    return Result.Error(notYetImplemented());
+    return Result.fmap(this.variance(), Math.sqrt);
   }
-  variance(): result<number, DistError> {
-    return Result.Error(notYetImplemented());
-  }
+  abstract variance(): result<number, DistError>;
+
   mode(): result<number, DistError> {
     return Result.Error(notYetImplemented());
   }

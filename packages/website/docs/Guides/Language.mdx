@@ -3,7 +3,7 @@ sidebar_position: 1
 title: Language Basics
 ---
 
-import { SquiggleEditor } from "../../src/components/SquiggleEditor";
+import { SquiggleEditor } from "@quri/squiggle-components";
 
 Squiggle supports some simple types and language features.
 
@@ -45,6 +45,13 @@ d.dist`}
 <SquiggleEditor
   defaultCode={`f(t) = normal(t^2, t^1.2+.01)
 f`}
+/>
+
+## Conditionals
+
+<SquiggleEditor
+  defaultCode={`x = 5
+if x<8 then 10 else 3`}
 />
 
 ## Anonymous Functions

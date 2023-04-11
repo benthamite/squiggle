@@ -1,6 +1,6 @@
-import { expectErrorToBeBounded, testRun } from "../helpers/helpers";
+import { expectErrorToBeBounded, testRun } from "../helpers/helpers.js";
 import * as fc from "fast-check";
-import { testEvalToBe } from "../helpers/reducerHelpers";
+import { testEvalToBe } from "../helpers/reducerHelpers.js";
 
 describe("Various SampleSet functions", () => {
   testEvalToBe(
@@ -12,7 +12,7 @@ describe("Various SampleSet functions", () => {
     "Sample Set Distribution"
   );
   testEvalToBe(
-    "SampleSet.fromFn({|| sample(normal(5,2))})",
+    "SampleSet.fromFn({|i| sample(normal(5,2))})",
     "Sample Set Distribution"
   );
   testEvalToBe(

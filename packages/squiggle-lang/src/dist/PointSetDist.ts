@@ -1,17 +1,17 @@
-import * as Continuous from "../PointSet/Continuous";
-import { ContinuousShape } from "../PointSet/Continuous";
+import * as Continuous from "../PointSet/Continuous.js";
+import { ContinuousShape } from "../PointSet/Continuous.js";
 
-import { MixedShape } from "../PointSet/Mixed";
+import { MixedShape } from "../PointSet/Mixed.js";
 
-import * as magicNumbers from "../magicNumbers";
-import * as Result from "../utility/result";
+import * as magicNumbers from "../magicNumbers.js";
+import * as Result from "../utility/result.js";
 
-import * as PointSet from "../PointSet/PointSet";
+import * as PointSet from "../PointSet/PointSet.js";
 
-import { BaseDist } from "./BaseDist";
-import { AnyPointSet } from "../PointSet/PointSet";
-import { DistError, sparklineError } from "./DistError";
-import { createSparkline } from "../utility/sparklines";
+import { BaseDist } from "./BaseDist.js";
+import { AnyPointSet } from "../PointSet/PointSet.js";
+import { DistError, sparklineError } from "./DistError.js";
+import { createSparkline } from "../utility/sparklines.js";
 
 export class PointSetDist<
   T extends AnyPointSet = AnyPointSet
@@ -36,6 +36,12 @@ export class PointSetDist<
   mean() {
     return this.pointSet.mean();
   }
+  variance(): Result.result<number, DistError> {
+    return Result.Ok(this.pointSet.variance());
+  }
+  downsample(n: number): PointSetDist {
+    return new PointSetDist(this.pointSet.downsample(n));
+  }
 
   private samplePointSet(pointSet: AnyPointSet) {
     const randomItem = Math.random();
@@ -45,12 +51,9 @@ export class PointSetDist<
     return this.samplePointSet(this.pointSet);
   }
   sampleN(n: number) {
-    const integralCache = this.pointSet.integral();
-    const distWithUpdatedIntegralCache =
-      this.pointSet.updateIntegralCache(integralCache);
     const items: number[] = new Array(n).fill(0);
     for (let i = 0; i <= n - 1; i++) {
-      items[i] = this.samplePointSet(distWithUpdatedIntegralCache);
+      items[i] = this.samplePointSet(this.pointSet);
     }
     return items;
   }
@@ -72,8 +75,8 @@ export class PointSetDist<
     return new PointSetDist(this.pointSet.normalize());
   }
 
-  integralEndY() {
-    return this.pointSet.integralEndY();
+  integralSum() {
+    return this.pointSet.integralSum();
   }
 
   pdf(f: number): Result.result<number, DistError> {

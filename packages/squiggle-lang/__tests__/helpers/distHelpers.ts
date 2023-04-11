@@ -1,6 +1,6 @@
-import * as SymbolicDist from "../../src/dist/SymbolicDist";
-import * as Result from "../../src/utility/result";
-import { defaultEnv, Env } from "../../src/dist/env";
+import * as SymbolicDist from "../../src/dist/SymbolicDist.js";
+import * as Result from "../../src/utility/result.js";
+import { defaultEnv, Env } from "../../src/dist/env.js";
 
 export const env: Env = defaultEnv;
 
@@ -29,4 +29,5 @@ export const mkTriangular = (low: number, medium: number, high: number) =>
   unpackResult(SymbolicDist.Triangular.make({ low, medium, high }));
 export const mkBernoulli = (p: number) =>
   unpackResult(SymbolicDist.Bernoulli.make(p));
-export const mkDelta = (x: number) => unpackResult(SymbolicDist.Float.make(x));
+export const mkPointMass = (x: number) =>
+  unpackResult(SymbolicDist.PointMass.make(x));

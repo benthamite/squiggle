@@ -1,21 +1,21 @@
-import { FRFunction } from "../library/registry/core";
-import { FnFactory, unpackDistResult } from "../library/registry/helpers";
-import * as SymbolicDist from "../dist/SymbolicDist";
-import * as Result from "../utility/result";
-import * as magicNumbers from "../magicNumbers";
-import { DistError, otherError } from "../dist/DistError";
-import { makeDefinition } from "../library/registry/fnDefinition";
-import { Value, vArray, vDist, vNumber } from "../value";
-import { frDist, frNumber } from "../library/registry/frTypes";
-import { Ok } from "../utility/result";
+import { FRFunction } from "../library/registry/core.js";
+import { FnFactory, unpackDistResult } from "../library/registry/helpers.js";
+import * as SymbolicDist from "../dist/SymbolicDist.js";
+import * as Result from "../utility/result.js";
+import * as magicNumbers from "../magicNumbers.js";
+import { DistError, otherError } from "../dist/DistError.js";
+import { makeDefinition } from "../library/registry/fnDefinition.js";
+import { Value, vArray, vDist, vNumber } from "../value/index.js";
+import { frDist, frNumber } from "../library/registry/frTypes.js";
+import { Ok } from "../utility/result.js";
 import {
   BinaryOperation,
   BinaryOperations,
   pointwiseCombinationFloat,
   scaleLog,
-} from "../dist/DistOperations";
-import { BaseDist } from "../dist/BaseDist";
-import { ErrorMessage, REDistributionError } from "../reducer/ErrorMessage";
+} from "../dist/DistOperations/index.js";
+import { BaseDist } from "../dist/BaseDist.js";
+import { ErrorMessage, REDistributionError } from "../reducer/ErrorMessage.js";
 
 const maker = new FnFactory({
   nameSpace: "",
@@ -60,7 +60,7 @@ const makeOperationFns = (): FRFunction[] => {
       maker.fromDefinition(
         makeDefinition(name, [frDist, frNumber], ([dist, n], { environment }) =>
           toValueResult(
-            op(dist, new SymbolicDist.Float(n), { env: environment })
+            op(dist, new SymbolicDist.PointMass(n), { env: environment })
           )
         )
       )
@@ -69,7 +69,7 @@ const makeOperationFns = (): FRFunction[] => {
       maker.fromDefinition(
         makeDefinition(name, [frNumber, frDist], ([n, dist], { environment }) =>
           toValueResult(
-            op(new SymbolicDist.Float(n), dist, { env: environment })
+            op(new SymbolicDist.PointMass(n), dist, { env: environment })
           )
         )
       )
@@ -112,7 +112,7 @@ export const library: FRFunction[] = [
   maker.d2n({ name: "max", fn: (d) => d.max() }),
   maker.d2n({ name: "mode", fn: (d) => unpackDistResult(d.mode()) }),
   maker.d2n({ name: "sample", fn: (d) => d.sample() }),
-  maker.d2n({ name: "integralSum", fn: (d) => d.integralEndY() }),
+  maker.d2n({ name: "integralSum", fn: (d) => d.integralSum() }),
   maker.fromDefinition(
     makeDefinition(
       "triangular",
@@ -134,9 +134,13 @@ export const library: FRFunction[] = [
     name: "exp",
     fn: (dist, env) => {
       return unpackDistResult(
-        BinaryOperations.algebraicPower(new SymbolicDist.Float(Math.E), dist, {
-          env,
-        })
+        BinaryOperations.algebraicPower(
+          new SymbolicDist.PointMass(Math.E),
+          dist,
+          {
+            env,
+          }
+        )
       );
     },
   }),
@@ -172,7 +176,7 @@ export const library: FRFunction[] = [
         toValueResult(
           pointwiseCombinationFloat(dist, {
             env: environment,
-            algebraicCombination: {
+            algebraicOperation: {
               NAME: "LogarithmWithThreshold",
               VAL: eps,
             },
@@ -187,7 +191,7 @@ export const library: FRFunction[] = [
       unpackDistResult(
         pointwiseCombinationFloat(dist, {
           env,
-          algebraicCombination: "Multiply",
+          algebraicOperation: "Multiply",
           f,
         })
       ),
@@ -198,7 +202,7 @@ export const library: FRFunction[] = [
       unpackDistResult(
         pointwiseCombinationFloat(dist, {
           env,
-          algebraicCombination: "Power",
+          algebraicOperation: "Power",
           f,
         })
       ),
@@ -209,7 +213,7 @@ export const library: FRFunction[] = [
       unpackDistResult(
         pointwiseCombinationFloat(dist, {
           env,
-          algebraicCombination: "Power",
+          algebraicOperation: "Power",
           f: Math.E,
         })
       ),
@@ -254,7 +258,7 @@ export const library: FRFunction[] = [
       unpackDistResult(
         BinaryOperations.algebraicLogarithm(
           dist,
-          new SymbolicDist.Float(Math.E),
+          new SymbolicDist.PointMass(Math.E),
           { env }
         )
       ),
@@ -263,27 +267,39 @@ export const library: FRFunction[] = [
     name: "log10",
     fn: (dist, env) =>
       unpackDistResult(
-        BinaryOperations.algebraicLogarithm(dist, new SymbolicDist.Float(10), {
-          env,
-        })
+        BinaryOperations.algebraicLogarithm(
+          dist,
+          new SymbolicDist.PointMass(10),
+          {
+            env,
+          }
+        )
       ),
   }),
   maker.d2d({
     name: "unaryMinus",
     fn: (dist, env) =>
       unpackDistResult(
-        BinaryOperations.algebraicMultiply(dist, new SymbolicDist.Float(-1), {
-          env,
-        })
+        BinaryOperations.algebraicMultiply(
+          dist,
+          new SymbolicDist.PointMass(-1),
+          {
+            env,
+          }
+        )
       ),
   }),
   maker.d2d({
     name: "dotExp",
     fn: (dist, env) =>
       unpackDistResult(
-        BinaryOperations.pointwisePower(new SymbolicDist.Float(Math.E), dist, {
-          env,
-        })
+        BinaryOperations.pointwisePower(
+          new SymbolicDist.PointMass(Math.E),
+          dist,
+          {
+            env,
+          }
+        )
       ),
   }),
   ...makeOperationFns(),

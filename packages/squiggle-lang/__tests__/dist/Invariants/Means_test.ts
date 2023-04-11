@@ -8,24 +8,24 @@ Details in https://squiggle-language.com/docs/internal/invariants/
 Note: epsilon of 1e3 means the invariants are, in general, not being satisfied. 
 */
 
-import { BaseDist } from "../../../src/dist/BaseDist";
+import { BaseDist } from "../../../src/dist/BaseDist.js";
 import {
   env,
   mkBeta,
-  mkDelta,
+  mkPointMass,
   mkExponential,
   mkLognormal,
   mkNormal,
   mkTriangular,
   mkUniform,
   unpackResult,
-} from "../../helpers/distHelpers";
+} from "../../helpers/distHelpers.js";
 import {
   BinaryOperations,
   BinaryOperation,
-} from "../../../src/dist/DistOperations";
-import { Env } from "../../../src/dist/env";
-import { expectErrorToBeBounded } from "../../helpers/helpers";
+} from "../../../src/dist/DistOperations/index.js";
+import { Env } from "../../../src/dist/env.js";
+import { expectErrorToBeBounded } from "../../helpers/helpers.js";
 
 const epsilon = 5e1;
 
@@ -37,7 +37,7 @@ const distributions = [
   // cauchyMake(1e0, 1e0),
   mkLognormal(2, 1),
   mkTriangular(1, 1e1, 5e1),
-  mkDelta(1e1),
+  mkPointMass(1e1),
 ];
 
 const combinations2 = <T>(arr: T[]): [T, T][] => {

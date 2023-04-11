@@ -1,23 +1,23 @@
-import * as Result from "../../utility/result";
-import * as E_A_Floats from "../../utility/E_A_Floats";
-import * as E_A_Sorted from "../../utility/E_A_Sorted";
-import * as Discrete from "../../PointSet/Discrete";
-import * as XYShape from "../../XYShape";
+import * as Result from "../../utility/result.js";
+import * as E_A_Floats from "../../utility/E_A_Floats.js";
+import * as E_A_Sorted from "../../utility/E_A_Sorted.js";
+import * as Discrete from "../../PointSet/Discrete.js";
+import * as XYShape from "../../XYShape.js";
 
-import { OperationError } from "../../operationError";
-import { ContinuousShape } from "../../PointSet/Continuous";
-import { DiscreteShape } from "../../PointSet/Discrete";
-import { PointSetDist } from "../PointSetDist";
-import { BaseDist } from "../BaseDist";
+import { OperationError } from "../../operationError.js";
+import { ContinuousShape } from "../../PointSet/Continuous.js";
+import { DiscreteShape } from "../../PointSet/Discrete.js";
+import { PointSetDist } from "../PointSetDist.js";
+import { BaseDist } from "../BaseDist.js";
 import {
   DistError,
   distOperationError,
   otherError,
   tooFewSamplesForConversionToPointSet,
-} from "../DistError";
-import { Env } from "../env";
-import { samplesToPointSetDist } from "./samplesToPointSetDist";
-import { buildMixedShape } from "../../PointSet/Mixed";
+} from "../DistError.js";
+import { Env } from "../env.js";
+import { samplesToPointSetDist } from "./samplesToPointSetDist.js";
+import { buildMixedShape } from "../../PointSet/Mixed.js";
 
 export class SampleSetDist extends BaseDist {
   samples: readonly number[];
@@ -38,7 +38,6 @@ export class SampleSetDist extends BaseDist {
     fn: (i: number) => number,
     env: Env
   ): Result.result<SampleSetDist, DistError> {
-    const sampleCount = env.sampleCount;
     const samples: number[] = [];
     for (let i = 0; i < env.sampleCount; i++) {
       samples.push(fn(i));
@@ -68,7 +67,7 @@ export class SampleSetDist extends BaseDist {
     return SampleSetDist.make(d.sampleN(env.sampleCount));
   }
 
-  integralEndY() {
+  integralSum() {
     // sampleset is always normalized
     return 1;
   }
@@ -144,9 +143,6 @@ sample everything.
     return pointSetDistR.value.pdf(f);
   }
 
-  stdev(): Result.result<number, DistError> {
-    return Result.Ok(E_A_Floats.stdev(this.samples));
-  }
   variance(): Result.result<number, DistError> {
     return Result.Ok(E_A_Floats.variance(this.samples));
   }

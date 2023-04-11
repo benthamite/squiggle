@@ -1,38 +1,98 @@
+import { testRun } from "../helpers/helpers.js";
 import {
   MySkip,
   testEvalToBe,
   testToExpression,
-} from "../helpers/reducerHelpers";
+} from "../helpers/reducerHelpers.js";
 
 describe("Symbolic constructors", () => {
-  testEvalToBe("Dist.normal(5,2)", "Normal(5,2)");
-  testEvalToBe("normal(5,2)", "Normal(5,2)");
-  testEvalToBe("normal({mean:5,stdev:2})", "Normal(5,2)");
-  testEvalToBe("-2 to 4", "Normal(1,1.8238704957353074)");
-  testEvalToBe("pointMass(5)", "PointMass(5)");
-});
-
-describe("eval on distribution functions", () => {
-  describe("normal distribution", () => {
+  describe("normal constructor", () => {
+    testEvalToBe("Dist.normal(5,2)", "Normal(5,2)");
     testEvalToBe("normal(5,2)", "Normal(5,2)");
-  });
-  describe("lognormal distribution", () => {
-    testEvalToBe("lognormal(5,2)", "Lognormal(5,2)");
-  });
-  describe("unaryMinus", () => {
-    testEvalToBe("mean(-normal(5,2))", "-5");
-    testEvalToBe("-normal(5,2)", "Normal(-5,2)");
-  });
-  describe("to", () => {
+
+    testEvalToBe("normal({mean:5,stdev:2})", "Normal(5,2)");
+
+    testEvalToBe("-2 to 4", "Normal(1,1.8238704957353071)");
+    testEvalToBe("to(-2,2)", "Normal(0,1.2159136638235382)");
     testEvalToBe(
-      "5 to 2",
-      "Error(Error: Low value must be less than high value.)"
+      "4 to -2",
+      "Error(Error: Low value must be less than high value)"
     );
+
+    testEvalToBe("normal({p5: -2, p95: 4})", "Normal(1,1.8238704957353071)");
+    expect(testRun("normal({p5: -2, p95: 4}) -> inv(0.05)").value).toBeCloseTo(
+      -2
+    );
+    expect(testRun("normal({p5: -2, p95: 4}) -> inv(0.95)").value).toBeCloseTo(
+      4
+    );
+
+    testEvalToBe("normal({p10: -2, p90: 4})", "Normal(1,2.3409124382171367)");
+    expect(testRun("normal({p10: -2, p90: 4}) -> inv(0.1)").value).toBeCloseTo(
+      -2
+    );
+    expect(testRun("normal({p10: -2, p90: 4}) -> inv(0.9)").value).toBeCloseTo(
+      4
+    );
+
+    testEvalToBe("normal({p25: -2, p75: 4})", "Normal(1,4.447806655516805)");
+    expect(testRun("normal({p25: -2, p75: 4}) -> inv(0.25)").value).toBeCloseTo(
+      -2
+    );
+    expect(testRun("normal({p25: -2, p75: 4}) -> inv(0.75)").value).toBeCloseTo(
+      4
+    );
+  });
+
+  describe("lognormal constructor", () => {
+    testEvalToBe("lognormal(5,2)", "Lognormal(5,2)");
+
     testEvalToBe(
       "to(2,5)",
       "Lognormal(1.1512925464970227,0.27853260523016377)"
     );
-    testEvalToBe("to(-2,2)", "Normal(0,1.2159136638235384)");
+
+    testEvalToBe(
+      "lognormal({p5: 2, p95: 5})",
+      "Lognormal(1.1512925464970227,0.27853260523016377)"
+    );
+    expect(
+      testRun("lognormal({p5: 2, p95: 5}) -> inv(0.05)").value
+    ).toBeCloseTo(2);
+    expect(
+      testRun("lognormal({p5: 2, p95: 5}) -> inv(0.95)").value
+    ).toBeCloseTo(5);
+
+    testEvalToBe(
+      "lognormal({p10: 2, p90: 5})",
+      "Lognormal(1.1512925464970227,0.3574927285445488)"
+    );
+    expect(
+      testRun("lognormal({p10: 2, p90: 5}) -> inv(0.1)").value
+    ).toBeCloseTo(2);
+    expect(
+      testRun("lognormal({p10: 2, p90: 5}) -> inv(0.9)").value
+    ).toBeCloseTo(5);
+
+    testEvalToBe(
+      "lognormal({p25: 2, p75: 5})",
+      "Lognormal(1.1512925464970227,0.6792473359363719)"
+    );
+    expect(
+      testRun("lognormal({p25: 2, p75: 5}) -> inv(0.25)").value
+    ).toBeCloseTo(2);
+    expect(
+      testRun("lognormal({p25: 2, p75: 5}) -> inv(0.75)").value
+    ).toBeCloseTo(5);
+  });
+
+  testEvalToBe("pointMass(5)", "PointMass(5)");
+});
+
+describe("eval on distribution functions", () => {
+  describe("unaryMinus", () => {
+    testEvalToBe("mean(-normal(5,2))", "-5");
+    testEvalToBe("-normal(5,2)", "Normal(-5,2)");
   });
   describe("mean", () => {
     testEvalToBe("mean(normal(5,2))", "5");
@@ -41,6 +101,14 @@ describe("eval on distribution functions", () => {
     testEvalToBe("mean(bernoulli(0.2))", "0.2");
     testEvalToBe("mean(bernoulli(0.8))", "0.8");
     testEvalToBe("mean(logistic(5,1))", "5");
+  });
+  describe("stdev", () => {
+    testEvalToBe("stdev(normal(5,2))", "2");
+    testEvalToBe("stdev(lognormal(1,2))", "147.04773715128695");
+    testEvalToBe("stdev(gamma(5,5))", "11.180339887498949");
+    testEvalToBe("stdev(bernoulli(0.2))", "0.4");
+    testEvalToBe("stdev(bernoulli(0.8))", "0.39999999999999997");
+    testEvalToBe("stdev(logistic(5,1))", "1.8137993642342178");
   });
   describe("toString", () => {
     testEvalToBe("toString(normal(5,2))", "'Normal(5,2)'");
@@ -69,6 +137,8 @@ describe("eval on distribution functions", () => {
   });
   describe("multiply", () => {
     testEvalToBe("normal(10, 2) * 2", "Normal(20,4)");
+    testEvalToBe("normal(10, 2) * 0", "PointMass(0)");
+    testEvalToBe("0 * normal(10, 2)", "PointMass(0)");
     testEvalToBe("2 * normal(10, 2)", "Normal(20,4)");
     testEvalToBe(
       "lognormal(5,2) * lognormal(10,2)",
